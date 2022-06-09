@@ -10,9 +10,15 @@ class ScoreDao extends DatabaseAccessor<MyDriftDatabase> with _$ScoreDaoMixin {
 
   Future<List<Score>> get allScores => select(driftScore).get();
 
-  Stream<Score> watchScore(String id) =>
-      (select(driftScore)..where((t) => t.id.equals(id))).watchSingle();
+  Future<Score?> getScore(String id) =>
+      (select(driftScore)..where((t) => t.id.equals(id))).getSingleOrNull();
+
+  Stream<Score?> watchScore(String id) =>
+      (select(driftScore)..where((t) => t.id.equals(id))).watchSingleOrNull();
 
   Future<int> createOrUpdateScore(Score entry) =>
       into(driftScore).insertOnConflictUpdate(entry);
+
+  Future<int> deleteScore(String id) =>
+      (delete(driftScore)..where((t) => t.id.equals(id))).go();
 }

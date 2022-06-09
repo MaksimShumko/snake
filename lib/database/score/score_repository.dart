@@ -12,22 +12,22 @@ class ScoreRepository implements ScoreDataSource {
   Future<Result<List<Score>>> getScores() async {
     final result = await _remote.getScores();
     if (result is Success) {
-      return await _local.getScores();
-    } else {
       return result;
+    } else {
+      return await _local.getScores();
     }
   }
 
   @override
-  Stream<Score> observeScore(String id) => _local.observeScore(id);
+  Stream<Result<Score>> observeScore(String id) => _local.observeScore(id);
 
   @override
   Future<Result<Score>> getScore(String id) async {
     final result = await _remote.getScore(id);
     if (result is Success) {
-      return await _local.getScore(id);
-    } else {
       return result;
+    } else {
+      return await _local.getScore(id);
     }
   }
 
@@ -45,7 +45,7 @@ class ScoreRepository implements ScoreDataSource {
   Future<Result> putScore(String id, Score score) async {
     final result = await _remote.putScore(id, score);
     if (result is Success) {
-      return await _local.putScore(id, score);
+      return await _local.postScore(score);
     } else {
       return result;
     }

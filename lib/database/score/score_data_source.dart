@@ -7,7 +7,7 @@ abstract class ScoreDataSource {
     throw NotImplementedError();
   }
 
-  Stream<Score> observeScore(String id) {
+  Stream<Result<Score>> observeScore(String id) {
     throw NotImplementedError();
   }
 

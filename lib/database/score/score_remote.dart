@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:snake/database/drift/drift_score.dart';
 import 'package:snake/database/result.dart';
@@ -9,36 +11,43 @@ class ScoreRemote extends ScoreDataSource {
 
   ScoreRemote(this._restClient);
 
-  Future<Result<List<Score>>> getScores() async {
-    await _restClient.getScores();
+  @override
+  Future<Result<List<Score>>> getScores() => _restClient
+      .getScores()
+      .then((value) => Result.success(value))
+      .catchError(_catchError<List<Score>>);
 
-    return await _restClient
-        .getScores()
-        .then((value) => Result.success(value))
-        .catchError((Object obj) {
-      switch (obj.runtimeType) {
-        case DioError:
-          final response = (obj as DioError).response;
-          return Result.failure(response?.statusMessage, response?.statusCode);
-        default:
-          break;
-      }
-    });
-  }
+  @override
+  Future<Result<Score>> getScore(String id) => _restClient
+      .getScore(id)
+      .then((value) => Result.success(value))
+      .catchError(_catchError<Score>);
 
-  Future<Result<Score>> getScore(String id) {
-    throw NotImplementedError();
-  }
+  @override
+  Future<Result> postScore(Score score) => _restClient
+      .postScore(score)
+      .then((value) => Result.success(value))
+      .catchError(_catchError);
 
-  Future<Result> postScore(Score score) {
-    throw NotImplementedError();
-  }
+  @override
+  Future<Result> putScore(String id, Score score) => _restClient
+      .putScore(id, score)
+      .then((value) => Result.success(value))
+      .catchError(_catchError);
 
-  Future<Result> putScore(String id, Score score) {
-    throw NotImplementedError();
-  }
+  @override
+  Future<Result> deleteScore(String id) => _restClient
+      .deleteScore(id)
+      .then((value) => Result.success(value))
+      .catchError(_catchError);
 
-  Future<Result> deleteScore(String id) {
-    throw NotImplementedError();
+  FutureOr<Result<T>> _catchError<T>(Object obj) {
+    switch (obj.runtimeType) {
+      case DioError:
+        final response = (obj as DioError).response;
+        return Result<T>.failure(response?.statusMessage, response?.statusCode);
+      default:
+        return Result<T>.remoteUnknownFailure();
+    }
   }
 }
